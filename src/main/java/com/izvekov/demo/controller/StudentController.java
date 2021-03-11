@@ -3,7 +3,9 @@ package com.izvekov.demo.controller;
 import com.izvekov.demo.dao.StudentJdbc;
 import com.izvekov.demo.model.Mark;
 import com.izvekov.demo.model.Student;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -16,29 +18,31 @@ public class StudentController {
         this.studentJdbc = studentJdbc;
     }
 
-//    {"id":3,  "surname":"Petrov","name":"Alexander","second_name":"Ivanovich", "study_group_id": 2}
-    @PostMapping("/student")
-    int newStudent(@RequestBody Student newStudent) {
-        try{
-            return studentJdbc.UpdateStudent(newStudent);
-        }
-        catch (Exception e){
-            return -1;
-        }
+    @GetMapping("/student/{id}") // показать студента по id
+    public Student getStudent(@PathVariable int id) {
+        Student student = studentJdbc.get(id);
+        return student;
+    }
+    /*
+    @GetMapping("/student/new/id={id}&surname={surname}&name={name}&second_name={second_name}&study_group_id={study_group_id}") // добавить студента
+    public Student addStudent(@PathVariable int id,@PathVariable String surname,@PathVariable String name,@PathVariable String second_name,@PathVariable int study_group_id) {
+        Student student = new Student(id, surname, name, second_name, study_group_id);
+        student = studentJdbc.addStudent(student);
+        return student;
+    }*/
+
+    @GetMapping("/student/all") // показать всех студентов
+    public List<Student> showAll() {
+        return studentJdbc.showAll();
     }
 
-    @GetMapping("/student/{id}")
-    public Student getStudent(@PathVariable int id){
-        return studentJdbc.get(id);
+    @GetMapping("/student/group_id/{group_id}") // показать по группе
+    public List<Student> showByGroup(@PathVariable int group_id) {
+        return studentJdbc.showByGroup(group_id);
     }
 
-    @GetMapping("/student/group/{student_group_id}")
-    public List<Student> getStudentByGroup(@PathVariable int student_group_id){
-        return studentJdbc.getStudentByGroup(student_group_id);
-    }
-
-    @GetMapping("/student/all")
-    public List<Student> getStudentByGroup(){
-        return studentJdbc.getAll();
+    @GetMapping("/student/name/{student_name}") // показать студента по имени
+    public List<Student> showByName(@PathVariable String student_name) {
+        return studentJdbc.showByName(student_name);
     }
 }

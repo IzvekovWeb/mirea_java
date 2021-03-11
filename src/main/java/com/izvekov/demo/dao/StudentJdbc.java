@@ -1,5 +1,6 @@
 package com.izvekov.demo.dao;
 
+import com.izvekov.demo.model.Mark;
 import com.izvekov.demo.model.Student;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -7,78 +8,59 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public class StudentJdbc {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public StudentJdbc(JdbcTemplate jdbcTemplate){
-        this.jdbcTemplate = jdbcTemplate;
+    public StudentJdbc(JdbcTemplate jdbcTemplate) { this.jdbcTemplate = jdbcTemplate; }
+
+    public Student get(int id) {
+        return jdbcTemplate.queryForObject("SELECT * FROM student WHERE id = ?", this::mapStudent, id);
     }
 
-    //  Просмотр студента
-    public Student get(int id){
-        String sql = "SELECT * FROM STUDENT WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, this::mapStudent, id);
-    }
-
-    //  Просмотр студентов по группе
-    public List<Student> getStudentByGroup(int study_group_id){
-        String sql = "SELECT * FROM STUDENT WHERE study_group_id = ?";
-        return jdbcTemplate.query(sql, this::mapStudent, study_group_id);
-    }
-
-    //  Просмотр всех студентов
-    public List<Student> getAll(){
-        String sql = "SELECT * FROM STUDENT";
-        return jdbcTemplate.query(sql, this::mapStudent);
-    }
-
-    //  Создание студента
-    public int CreateStudent(int id, String surname, String name, String second_name, int study_group_id) {
-        return jdbcTemplate.update(
-                "INSERT INTO STUDENT VALUES(?, ?, ?, ?, ?)",
-                id, surname, name,second_name, study_group_id);
-    }
-
-    public int CreateStudent(Student student) {
-        return jdbcTemplate.update(
-                "INSERT INTO STUDENT VALUES(?, ?, ?, ?, ?)",
-                student.getId(), student.getSurname(),
-                student.getName(),student.getSecondName(),
-                student.getStudy_group_id());
-    }
-
-    //  Редактирование студента
-    public int UpdateStudent(int id, String surname, String name, String second_name, int study_group_id) {
-        return jdbcTemplate.update(
-                "MERGE INTO STUDENT KEY (ID) VALUES (?, ?, ?, ?, ?)",
-                id, surname, name,second_name, study_group_id);
-
-    }
-
-    public int UpdateStudent(Student student) {
-        return jdbcTemplate.update(
-                "MERGE INTO STUDENT KEY (ID) VALUES (?, ?, ?, ?, ?)",
-                student.getId(), student.getSurname(),
-                student.getName(),student.getSecondName(),
-                student.getStudy_group_id());
-    }
-
-
-    private Student mapStudent(ResultSet rs, int i) throws SQLException{
-        return new Student(
+    private Student mapStudent(ResultSet rs, int i) throws SQLException {
+        Student student = new Student(
                 rs.getInt("id"),
                 rs.getString("surname"),
                 rs.getString("name"),
-                rs.getString("second_name")
+                rs.getString("second_name"),
+                rs.getInt("study_group_id")
         );
+        return student;
     }
 
-    //  Удаление студента
-    public int delete(String id) {
-        return jdbcTemplate.update("DELETE FROM STUDENT WHERE id = ?", id);
+    // поиск по имени сутдента
+    public List<Student> showByName(String student_name) {
+        return jdbcTemplate.query("SELECT * FROM student WHERE name = ?", this::mapStudent, student_name);
     }
 
+    // показать всех студентов
+    public List<Student> showAll() {
+        return jdbcTemplate.query("SELECT * FROM student", this::mapStudent);
+    }
+
+    // показать по группе
+    public List<Student> showByGroup(int group_id) {
+        return jdbcTemplate.query("SELECT * FROM student WHERE study_group_id = ?", this::mapStudent, group_id);
+    }
+
+    // добавить студента
+    public Student addStudent(Student student) {
+        assert jdbcTemplate.update("INSERT INTO student VALUES (?, ?, ?, ?, ?)", student.getId(), student.getSurname(), student.getName(), student.getSecondName(), student.getStudyGroupId()) > 0;
+        return get(student.getId());
+    }
+
+    // изменить студента
+    public Student editStudent(Student student) {
+        assert jdbcTemplate.update("UPDATE student SET surname = ?2, name = ?3, second_name = ?4, study_group_id = ?5 where id = ?1", student.getId(), student.getSurname(), student.getName(), student.getSecondName(), student.getStudyGroupId()) > 0;
+        return get(student.getId());
+    }
+
+    // удалить студента
+    public int delete(int id) {
+        return jdbcTemplate.update("DELETE FROM student WHERE id = ?", id);
+    }
 }
