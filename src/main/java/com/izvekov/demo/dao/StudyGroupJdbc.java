@@ -1,5 +1,6 @@
 package com.izvekov.demo.dao;
 
+import com.izvekov.demo.model.Student;
 import com.izvekov.demo.model.StudyGroup;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
