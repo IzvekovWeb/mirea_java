@@ -17,14 +17,16 @@ public class StudyGroupPlanController {
         this.studyGroupPlanJdbc = studyGroupPlanJdbc;
     }
 
-    @GetMapping("/study_group_plan/{id}")
-    public StudyGroupPlan getStudyGroupPlan(@PathVariable int id) {
-        StudyGroupPlan studyGroupPlan = studyGroupPlanJdbc.get(id);
-        return studyGroupPlan;
-    }
+
 
     @GetMapping("/study_group_plan/show_all")
     public List<StudyGroupPlan> getStudyGroupPlan() {
         return studyGroupPlanJdbc.showAll();
+    }
+
+    @GetMapping("/study_group_plan/{id}")
+    public StudyGroupPlan getStudyGroupPlan(@PathVariable int id) {
+        StudyGroupPlan studyGroupPlan = studyGroupPlanJdbc.get(id);
+        return studyGroupPlan;
     }
 }

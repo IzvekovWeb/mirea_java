@@ -28,13 +28,15 @@ public class StudyGroupJdbc {
         return studyGroup;
     }
 
-    // показать все группы
-    public List<StudyGroup> showAll() {
-        return jdbcTemplate.query("SELECT * FROM study_group", this::mapStudyGroup);
-    }
+
 
     // удалить группу
     public int delete(int id) {
         return jdbcTemplate.update("DELETE FROM study_group WHERE id = ?", id);
+    }
+
+    // показать все группы
+    public List<StudyGroup> showAll() {
+        return jdbcTemplate.query("SELECT * FROM study_group", this::mapStudyGroup);
     }
 }
